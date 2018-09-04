@@ -1,5 +1,5 @@
 //check mongoose.com -docs -queries
-const {ObjectID} = require ('mongodb')
+const {ObjectID} = require ('mongodb');
 
 const {mongoose} = require('./../server/db/mongoose');
 const {Todo} = require('./../server/models/todo');
@@ -24,7 +24,7 @@ const {User} = require('./../server/models/user');
 // });
 
 // Todo.findById(id).then((todo) => {        //-if does not exist: returns null (without if)
-//   if (!todo) {
+//   if (!todo) {                             // if todo does not exist
 //     return console.log('ID not found');
 //   }
 //   console.log('Todo by ID', todo);
