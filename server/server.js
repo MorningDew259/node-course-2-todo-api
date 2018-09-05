@@ -8,7 +8,7 @@ var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 
 var app = express();
-cont port = process.env.PORT || 3000;           // for Heroku server || = or (if port is not available)
+const port = process.env.PORT || 3000;           // for Heroku server || = or (if port is not available)
 
 app.use(bodyParser.json());
 
