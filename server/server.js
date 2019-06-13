@@ -3,18 +3,15 @@ require('./config/config');
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
-const {ObjectID} = require ('mongodb');
+const {ObjectID} = require('mongodb');
 
-//local installs
-var {mongoose} = require('./db/mongoose');        //mongoose.js -> .js can be left out
+var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 var {authenticate} = require('./middleware/authenticate');
 
-
-
 var app = express();
-const port = process.env.PORT || 3000;           // for Heroku server || = or (if port is not available)
+const port = process.env.PORT;
 
 app.use(bodyParser.json());
 
@@ -30,7 +27,6 @@ app.post('/todos', (req, res) => {
   });
 });
 
-
 app.get('/todos', (req, res) => {
   Todo.find().then((todos) => {
     res.send({todos});
@@ -39,20 +35,20 @@ app.get('/todos', (req, res) => {
   });
 });
 
-
-app.get('/todos/:id', (req, res) => {     //get todo with ID
+app.get('/todos/:id', (req, res) => {
   var id = req.params.id;
 
-   if (!ObjectID.isValid(id)) {         //check if ObjectID is valid
-     return res.status(404).send();     //if not valid return 404 error (doesn't continue)
-   };
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
 
   Todo.findById(id).then((todo) => {
-    if (!todo) {                        //if no entry found return 404 error
+    if (!todo) {
       return res.status(404).send();
     }
-      res.send({todo});                 //if everything alright return data entry
-  }).catch((e) => {                     //catch any errors and return 400 error
+
+    res.send({todo});
+  }).catch((e) => {
     res.status(400).send();
   });
 });
@@ -62,7 +58,7 @@ app.delete('/todos/:id', (req, res) => {
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
-  };
+  }
 
   Todo.findByIdAndRemove(id).then((todo) => {
     if (!todo) {
@@ -72,12 +68,12 @@ app.delete('/todos/:id', (req, res) => {
     res.send({todo});
   }).catch((e) => {
     res.status(400).send();
-  })
+  });
 });
 
 app.patch('/todos/:id', (req, res) => {
   var id = req.params.id;
-  var body = _.pick(req.body, ['text', 'completed']);       //only text and completed can be changed
+  var body = _.pick(req.body, ['text', 'completed']);
 
   if (!ObjectID.isValid(id)) {
     return res.status(404).send();
@@ -101,7 +97,7 @@ app.patch('/todos/:id', (req, res) => {
   })
 });
 
-//POST /users
+// POST /users
 app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
   var user = new User(body);
@@ -112,6 +108,7 @@ app.post('/users', (req, res) => {
     res.header('x-auth', token).send(user);
   }).catch((e) => {
     res.status(400).send(e);
+    console.log(e);
   })
 });
 
@@ -119,23 +116,22 @@ app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
 
+// POST /users/login {email, password}
 app.post('/users/login', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
 
   User.findByCredentials(body.email, body.password).then((user) => {
-    user.generateAuthToken().then((token) => {
+    return user.generateAuthToken().then((token) => {
       res.header('x-auth', token).send(user);
     });
   }).catch((e) => {
     res.status(400).send();
+    console.log(e);
   });
 });
-
-//app.delete('/users/me/token', )
 
 app.listen(port, () => {
   console.log(`Started up at port ${port}`);
 });
-
 
 module.exports = {app};
