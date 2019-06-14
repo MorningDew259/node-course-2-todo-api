@@ -108,7 +108,6 @@ app.post('/users', (req, res) => {
     res.header('x-auth', token).send(user);
   }).catch((e) => {
     res.status(400).send(e);
-    console.log(e);
   })
 });
 
@@ -126,7 +125,6 @@ app.post('/users/login', (req, res) => {
     });
   }).catch((e) => {
     res.status(400).send();
-    console.log(e);
   });
 });
 
